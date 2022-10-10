@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-16"?>
+<WAPA APPLNAME="ZFMMI_ADAPTER" APPLCLAS="ZCL_FMMI_ADAPTER" AUTHOR="F0019738" CREATEDON="20140514" CHANGEDBY="F0019738" CHANGEDON="20140625" APPLEXT="ZFMMI_ADAPTER" DEVCLASS="$TMP" ORIGLANG="E" MODIFLANG="E" TEXT="FMMI App Web Adapter">
+ <page APPLNAME="ZFMMI_ADAPTER" PAGEKEY="ACTIONREASONS.JSON" PAGENAME="actionReasons.json" AUTHOR="F0019738" CREATEDON="20140619" CHANGEDBY="F0019738" CHANGEDON="20140619" IMPLCLASS="CL_O24Q9ANXD0J3GHGIHW44MEUSVT1" GENDATE="20140625" GENTIME="184347" CHANGETIME="123505" MIMETYPE="application/octet-stream" STATE="1" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Get List of Action Reasons">
+  <layout>&lt;%= json %&gt;</layout>
+  <event APPLNAME="ZFMMI_ADAPTER" PAGEKEY="ACTIONREASONS.JSON" EVHANDLER="ONCREATE" VERSION="A" EVHNAME="OnCreate">* this handler is called once the page is first created (stateful mode)
+* it performs a once-off data initialization or object creation</event>
+  <event APPLNAME="ZFMMI_ADAPTER" PAGEKEY="ACTIONREASONS.JSON" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _request type string,
+      _respone type string,
+      _action type syucomm,
+      _app type ZXX_APPID.
+
+data: _fmmi_adapter type ref to fmmi_data_adapter.
+
+data: _appid type zxx_appid.
+data: _wiid type sww_wiid.
+data: _processing_status type ZXX_FMMI_BSTATUSID.
+data: _comments type string.
+
+_app = request-&gt;get_form_field( &apos;APPID&apos; ).
+_action = request-&gt;get_form_field( &apos;ACTION&apos; ).
+_request = request-&gt;get_form_field( &apos;REQUEST&apos; ).
+_processing_status = request-&gt;get_form_field( &apos;STATUS&apos; ).
+
+translate _action to upper case.
+
+if _action is not initial.
+
+  try.
+
+      get badi _fmmi_adapter
+        filters
+          appid     = _app.
+
+      if _fmmi_adapter is bound.
+
+        call badi _fmmi_adapter-&gt;actionReasons
+          exporting
+            request     = _request
+            action      = _action
+            procstat    = _processing_status
+          changing
+            response    = json.
+
+      endif.
+
+    catch cx_root.
+      clear json.
+
+  endtry.
+
+endif.</event>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="ACTIONREASONS.JSON" COMPNAME="JSON" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="json"/>
+ </page>
+ <page APPLNAME="ZFMMI_ADAPTER" PAGEKEY="CONTENT.JSON" PAGENAME="content.json" AUTHOR="F0019738" CREATEDON="20140625" CHANGEDBY="F0019738" CHANGEDON="20140625" IMPLCLASS="CL_O2B588CNNZSVRA1PGR12CCCOA9X" GENDATE="20140625" GENTIME="184348" CHANGETIME="182405" MIMETYPE="application/octet-stream" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="FI DOCUMENT Content">
+  <layout>&lt;%= json %&gt;</layout>
+  <event APPLNAME="ZFMMI_ADAPTER" PAGEKEY="CONTENT.JSON" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _app type ZXX_APPID.
+data: _docid type string,
+      _wiid type sww_wiid.
+
+
+_docid = request-&gt;get_form_field( &apos;ID&apos; ).
+_wiid = request-&gt;get_form_field( &apos;WI_ID&apos; ).
+_app = request-&gt;get_form_field( &apos;APPID&apos; ).
+
+json = application-&gt;get_content( docid = _docid wi_id = _wiid appid = _app ).</event>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="CONTENT.JSON" COMPNAME="JSON" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="json"/>
+ </page>
+ <page APPLNAME="ZFMMI_ADAPTER" PAGEKEY="DOACTION.JSON" PAGENAME="doAction.json" AUTHOR="F0019738" CREATEDON="20140514" CHANGEDBY="F0019738" CHANGEDON="20140620" IMPLCLASS="CL_O281I0YRPX3RQ3T2QJSSKWUCV0L" GENDATE="20140625" GENTIME="184347" CHANGETIME="125458" MIMETYPE="application/octet-stream" STATE="1" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Execute Web Form Action">
+  <layout>&lt;%= json %&gt;</layout>
+  <event APPLNAME="ZFMMI_ADAPTER" PAGEKEY="DOACTION.JSON" EVHANDLER="ONCREATE" VERSION="A" EVHNAME="OnCreate">* this handler is called once the page is first created (stateful mode)
+* it performs a once-off data initialization or object creation</event>
+  <event APPLNAME="ZFMMI_ADAPTER" PAGEKEY="DOACTION.JSON" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _request type string,
+      _respone type string,
+      _action type syucomm,
+      _app type ZXX_APPID.
+
+data: _fmmi_adapter type ref to fmmi_data_adapter.
+
+data: _appid type zxx_appid.
+data: _wiid type sww_wiid.
+data: _processing_status type ZXX_FMMI_BSTATUSID.
+data: _comments type string.
+data: _reason type SYUCOMM.
+
+_app = request-&gt;get_form_field( &apos;APPID&apos; ).
+_action = request-&gt;get_form_field( &apos;ACTION&apos; ).
+_request = request-&gt;get_form_field( &apos;REQUEST&apos; ).
+_wiid = request-&gt;get_form_field( &apos;WIID&apos; ).
+_comments = request-&gt;get_form_field( &apos;COMMENTS&apos; ).
+_reason = request-&gt;get_form_field( &apos;REASON&apos; ).
+
+translate _action to upper case.
+
+if _action is not initial.
+
+  try.
+
+      get badi _fmmi_adapter
+        filters
+          appid     = _app.
+
+      if _fmmi_adapter is bound.
+
+        call badi _fmmi_adapter-&gt;handle_action
+          exporting
+            workitem    = _wiid
+            request     = _request
+            action      = _action
+            notes       = _comments
+            reason      = _reason
+          changing
+            response    = json.
+
+      endif.
+
+    catch cx_root.
+      clear json.
+
+  endtry.
+
+endif.</event>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="DOACTION.JSON" COMPNAME="JSON" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="json"/>
+ </page>
+ <page APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" PAGENAME="email_error.htm" AUTHOR="F0019738" CREATEDON="20140917" CHANGEDBY="F0019738" CHANGEDON="20140917" IMPLCLASS="CL_O205590UN055T18SBA5H0NEXOUD" GENDATE="20140917" GENTIME="160629" CHANGETIME="160626" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Admin Error Notification">
+  <layout>&lt;html&gt;
+&lt;body&gt;
+
+  &lt;FONT face=&quot;Arial&quot;&gt;
+  &lt;p&gt;An error occurred when document &lt;a href=&quot;&lt;%= url %&gt;&quot; target=&quot;_blank&quot; &gt;&lt;%= docid-docnr %&gt;&lt;/a&gt; was submitted to workflow.&lt;/p&gt;
+  &lt;p&gt;
+
+  &lt;center&gt;
+  &lt;TABLE  width= &quot;100%&quot; border=&quot;0&quot;&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Error Type: &lt;%= status %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Workflow &lt;%= apptext %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Type: &lt;%= doctype %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Creator: &lt;%= agent %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;&lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Date: &lt;%= docdate %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+ &lt;/ccenter&gt;
+
+ &lt;/font&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _messages   type zfmmi_messages,
+      _msg        type zfmmi_message,
+      _is_ok      type flag_x,
+      _user       type soudnamei1,
+      _user_data  type soudatai1,
+      _uname      type syuname,
+      _value      type string,
+      _app type zxx_appid.
+
+_app =  request-&gt;get_form_field( &apos;APP&apos; ).
+apptext = ZCL_APPCFG=&gt;text( _app ).
+
+_value = request-&gt;get_form_field( &apos;AGENT&apos; ).
+
+url =  request-&gt;get_form_field( &apos;URL&apos; ).
+
+wiid = request-&gt;get_form_field( &apos;WIID&apos; ).
+status = request-&gt;get_form_field( &apos;STATUS_TEXT&apos; ).
+doctype = request-&gt;get_form_field( &apos;DOC_TYPE&apos; ).
+
+try.
+    if _value+0(2) eq &apos;US&apos;.
+      shift _value left by 2 places.
+    endif.
+    _uname = _value.
+
+  catch cx_root.
+    clear _uname.
+endtry.
+
+clear _user.
+_user-sapname = _uname.
+
+call function &apos;SO_USER_READ_API1&apos;
+  exporting
+    user      = _user
+  importing
+    user_data = _user_data.
+
+agent = _user_data-fullname.
+
+docid = request-&gt;get_form_field( &apos;ID&apos; ).
+
+*if _docid is not initial.
+*
+*  try.
+*      create object fmbb
+*        exporting
+*          docid  = _docid
+*        exceptions
+*          error  = 1
+*          others = 2.
+*
+*      if sy-subrc ne 0.
+*        clear fmbb.
+*      endif.
+*
+*    catch cx_root.
+*      clear fmbb.
+*  endtry.
+*
+*  if fmbb is bound.
+*
+*    call method fmbb-&gt;get_content
+*      importing
+*        is_ok     = _is_ok
+*      changing
+*        msg_lines = _messages.
+*
+*
+*  endif.
+*endif.</event>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" COMPNAME="AGENT" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="agent"/>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" COMPNAME="APPTEXT" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="apptext"/>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" COMPNAME="DOCDATE" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="docdate"/>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" COMPNAME="DOCID" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="FMED_S_DOCID" ALIASNAME="docid" TEXT="FM entry document ID"/>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" COMPNAME="DOCTYPE" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="doctype"/>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" COMPNAME="STATUS" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="status"/>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" COMPNAME="URL" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="url"/>
+  <parameter APPLNAME="ZFMMI_ADAPTER" PAGEKEY="EMAIL_ERROR.HTM" COMPNAME="WIID" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="SWW_WIID" ALIASNAME="wiid" TEXT="Work item ID"/>
+ </page>
+ <page APPLNAME="ZFMMI_ADAPTER" PAGEKEY="WIUNLOCK.HTM" PAGENAME="wiunlock.htm" AUTHOR="F0019738" CREATEDON="20140617" CHANGEDBY="F0019738" CHANGEDON="20140617" IMPLCLASS="CL_O23ZZET64OP9YOW8PB6KYXW0JD1" GENDATE="20140625" GENTIME="184347" CHANGETIME="130923" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Unlock Workitem">
+  <event APPLNAME="ZFMMI_ADAPTER" PAGEKEY="WIUNLOCK.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data:
+      _wi_reserved type boole_d,
+      _wi_locked type boole_d,
+      _wiid type sww_wiid.
+
+data:
+         lo_lock_area_handle type ref to zcl_fmmi_wilock_area,
+         lo_lock_area_handle_write type ref to zcl_fmmi_wilock_area,
+         lo_lock_area_read type ref to zcl_fmmi_wilock,
+         lo_lock_area_write type ref to zcl_fmmi_wilock,
+         lx_wi_locked  type ref to zcx_fmmi_wi_lock,
+         lt_wi_locks type zfmmi_wi_lock_tabtype,
+         islocked type boole_d value abap_false,
+         lockworkitem type boole_d value abap_false.
+
+_wiid = request-&gt;get_form_field( &apos;WI_ID&apos; ).
+
+if _wiid is not initial.
+
+  call method zcl_fmmi_wi_handler=&gt;is_wi_locked
+    exporting
+      url_workitem = _wiid
+    importing
+      wi_reserved  = _wi_reserved
+      wi_locked    = _wi_locked.
+
+
+  if _wi_locked eq abap_true and _wi_reserved eq abap_true.
+
+    call function &apos;SAP_WAPI_SET_WORKITEM_STATUS&apos;
+     exporting
+       workitem_id          = _wiid
+       status               = &apos;READY&apos;
+*       USER                 = SY-UNAME
+*       LANGUAGE             = SY-LANGU
+*       DO_COMMIT            = &apos;X&apos;
+*     IMPORTING
+*      NEW_STATUS           =
+*      RETURN_CODE          =
+*      TABLES
+*      MESSAGE_LINES        =
+*      MESSAGE_STRUCT       =
+             .
+  endif.
+
+  &quot;
+  &quot; Unlock the workitem
+  &quot;
+*
+  if _wi_locked = abap_true.
+    try.
+        lo_lock_area_handle = zcl_fmmi_wilock_area=&gt;attach_for_update( ).
+        lo_lock_area_write ?= lo_lock_area_handle-&gt;root.
+      catch cx_root.
+        try.
+            lo_lock_area_handle =  zcl_fmmi_wilock_area=&gt;attach_for_write( ).
+            create object lo_lock_area_write area handle lo_lock_area_handle.
+            lo_lock_area_handle-&gt;set_root( lo_lock_area_write ).
+          catch cx_root.
+        endtry.
+    endtry.
+
+    &quot; unLock the workitem
+    lo_lock_area_write-&gt;releaseworkitem( wi_id = _wiid ).
+    lo_lock_area_handle-&gt;detach_commit( ).
+  endif.
+
+endif.</event>
+ </page>
+</WAPA>

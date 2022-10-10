@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-16"?>
+<CLAS CLSNAME="ZCL_XXSB_JSON_OBJECT" VERSION="1" LANGU="E" DESCRIPT="JSON Object" UUID="BB446A53887CA836E1000000C782C605" CATEGORY="00" EXPOSURE="2" STATE="1" RELEASE="0" AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="20140507" CHGDANYON="00000000" CLSCCINCL="X" FIXPT="X" UNICODE="X" R3RELEASE="701" CLSBCCAT="00" DURATION_TYPE="0 " RISK_LEVEL="0 " REFCLSNAME="ZCL_XXSB_JSON" CHANGEDBY="F0019738">
+ <publicSection>class ZCL_XXSB_JSON_OBJECT definition
+  public
+  inheriting from ZCL_XXSB_JSON
+  create public .
+
+*&quot;* public components of class ZCL_XXSB_JSON_OBJECT
+*&quot;* do not include other source files here!!!
+public section.
+
+  methods CONSTRUCTOR .
+
+  methods ADD_DATA
+    redefinition .
+  methods ENCODED
+    redefinition .</publicSection>
+ <protectedSection>*&quot;* protected components of class ZCL_XXSB_JSON_OBJECT
+*&quot;* do not include other source files here!!!
+protected section.
+
+  data DATA type TJSONT .</protectedSection>
+ <privateSection>*&quot;* private components of class ZCL_XXSB_JSON_OBJECT
+*&quot;* do not include other source files here!!!
+private section.</privateSection>
+ <localImplementation>*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</localImplementation>
+ <localTypes>*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</localTypes>
+ <localMacros>*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</localMacros>
+ <textPool/>
+ <classDocumentation/>
+ <attribute CLSNAME="ZCL_XXSB_JSON_OBJECT" CMPNAME="DATA" VERSION="1" LANGU="E" EXPOSURE="1" STATE="1" EDITORDER="1 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" ATTDECLTYP="0" ATTEXPVIRT="0" TYPTYPE="1" TYPE="TJSONT" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " R3RELEASE="701" TYPESRC_LENG="0 "/>
+ <inheritance CLSNAME="ZCL_XXSB_JSON_OBJECT" REFCLSNAME="ZCL_XXSB_JSON" VERSION="1" STATE="1" AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140507">
+  <redefinition CLSNAME="ZCL_XXSB_JSON_OBJECT" REFCLSNAME="ZCL_XXSB_JSON" VERSION="1" MTDNAME="ADD_DATA"/>
+  <redefinition CLSNAME="ZCL_XXSB_JSON_OBJECT" REFCLSNAME="ZCL_XXSB_JSON" VERSION="1" MTDNAME="ENCODED"/>
+ </inheritance>
+ <method CLSNAME="ZCL_XXSB_JSON" CMPNAME="ADD_DATA" VERSION="0" EXPOSURE="0" STATE="0" EDITORDER="0 " DISPID="0 " CREATEDON="00000000" CHANGEDON="00000000" MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+  <source>method ADD_DATA.
+*CALL METHOD SUPER-&gt;ADD_DATA
+*  EXPORTING
+**    fieldname  =
+*    FIELDVALUE =
+*    .
+
+  data: __ttdesc type ref to cl_abap_typedescr,
+        __elem type ref to cl_abap_elemdescr.
+
+  data: _val(512) type c.
+
+  field-symbols: &lt;fld&gt; type string,
+                 &lt;json&gt; type tjson.
+
+  append initial line to me-&gt;data assigning &lt;json&gt;.
+
+  __ttdesc = cl_abap_structdescr=&gt;describe_by_data( fieldvalue ).
+
+  if fieldname is initial.
+     &lt;json&gt;-fieldname = __ttdesc-&gt;absolute_name.
+  else.
+     &lt;json&gt;-fieldname = fieldname.
+  endif.
+
+  translate &lt;json&gt;-fieldname to lower case.
+
+  case __ttdesc-&gt;type_kind.
+    when &apos;D&apos;.
+       write fieldvalue to _val DD/MM/YYYY.
+       &lt;json&gt;-fieldvalue = _val.
+*    when &apos;P&apos;.
+*       clear _val.
+*       write fieldvalue to _val.
+*       &lt;json&gt;-fieldvalue = _val.
+    when others.
+      &lt;json&gt;-fieldvalue = fieldvalue.
+
+  endcase.
+
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+ <method CLSNAME="ZCL_XXSB_JSON_OBJECT" CMPNAME="CONSTRUCTOR" VERSION="1" LANGU="E" DESCRIPT="CONSTRUCTOR" EXPOSURE="2" STATE="1" EDITORDER="1 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" MTDTYPE="2" MTDDECLTYP="0" R3RELEASE="701" BCMTDCAT="00" BCMTDSYN="0">
+  <source>method constructor.
+
+  call method super-&gt;constructor.
+
+  clear me-&gt;data.
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+ <method CLSNAME="ZCL_XXSB_JSON" CMPNAME="ENCODED" VERSION="0" EXPOSURE="0" STATE="0" EDITORDER="0 " DISPID="0 " CREATEDON="00000000" CHANGEDON="00000000" MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+  <source>method ENCODED.
+*CALL METHOD SUPER-&gt;ENCODED
+*  RECEIVING
+*    JSON   =
+*    .
+
+  field-symbols: &lt;fld&gt; type string,
+                 &lt;json&gt; type tjson.
+
+  data: _val type string,
+        _nam type string,
+        _pair type string.
+
+
+  loop at me-&gt;data assigning &lt;json&gt;.
+    clear: _val, _nam, _pair.
+
+    concatenate &apos;&quot;&apos; &lt;json&gt;-fieldname &apos;&quot;&apos; into _nam.
+    concatenate &apos;&quot;&apos; &lt;json&gt;-fieldvalue &apos;&quot;&apos; into _val.
+    concatenate _nam _val into _pair separated by &apos;:&apos;.
+
+    if json is initial.
+       json = _pair.
+    else.
+       if _pair is not initial.
+         concatenate json _pair into json separated by &apos;,&apos;.
+       endif.
+    endif.
+  endloop.
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+</CLAS>

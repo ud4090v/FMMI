@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="utf-16"?>
+<WAPA APPLNAME="ZFI_FMMI_FMBB" APPLCLAS="ZCL_FMBB_APPL" AUTHOR="F0019738" CREATEDON="20140618" CHANGEDBY="F0019738" CHANGEDON="20140618" APPLEXT="ZFI_FMMI_FMBB" STARTPAGE="start.html" DEVCLASS="$TMP" ORIGLANG="E" MODIFLANG="E" TEXT="FMMI Budgeting Document Approval (FMBB)">
+ <page APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="CONTENT.JSON" PAGENAME="content.json" AUTHOR="F0019738" CREATEDON="20140618" CHANGEDBY="F0019738" CHANGEDON="20140618" IMPLCLASS="CL_O2EBJ9D54MRJLOG5RNITO0GS1DX" GENDATE="20140618" GENTIME="124944" CHANGETIME="124922" MIMETYPE="application/octet-stream" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="DOCUMENT Content">
+  <layout>&lt;%= json %&gt;</layout>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="CONTENT.JSON" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _docid type FMED_S_DOCID,
+      _wiid type sww_wiid.
+
+_docid = request-&gt;get_form_field( &apos;ID&apos; ).
+_wiid = request-&gt;get_form_field( &apos;WI_ID&apos; ).
+
+if _docid is not initial.
+
+  json = application-&gt;get_content( docid = _docid wi_id = _wiid ).
+
+endif.</event>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="CONTENT.JSON" COMPNAME="JSON" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="json"/>
+ </page>
+ <page APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_APPROVE.HTM" PAGENAME="email_approve.htm" AUTHOR="F0019738" CREATEDON="20140618" CHANGEDBY="F0019738" CHANGEDON="20150617" IMPLCLASS="CL_O2EDNZIH384XCCLBY7QHDJB3OJP" GENDATE="20150617" GENTIME="142058" CHANGETIME="141904" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Approval Notification">
+  <layout>&lt;%
+data:  _doc_item TYPE ZFI_FMBB_ITEM.
+DATA:  _camt TYPE char15,
+       _hamt type char15.
+data: _ddate(10) type c,
+      _pdate(10) type c,
+      _docUrl type string.
+
+if fmbb is bound.
+  write fmbb-&gt;content-header-docdate to _ddate MM/DD/YYYY.
+  write fmbb-&gt;content-header-postdate to _pdate MM/DD/YYYY.
+  write fmbb-&gt;content-header-amt_total to _hamt currency &apos;USD&apos;.
+endif.
+
+%&gt;
+
+&lt;html&gt;
+&lt;body&gt;
+
+  &lt;FONT face=&quot;Arial&quot;&gt;
+  &lt;p&gt;Document &lt;a href=&quot;&lt;%= Url %&gt;&quot; target=&quot;_blank&quot; &gt;&lt;%= fmbb-&gt;content-header-docnr %&gt;&lt;/a&gt;
+     for fiscal year &lt;B&gt;&lt;%= fmbb-&gt;content-header-docyear %&gt;&lt;/B&gt;
+     has been successfully approved and posted by &lt;%= im_approver %&gt;
+  &lt;/p&gt;
+
+  &lt;center&gt;
+  &lt;TABLE  width= &quot;100%&quot; border=&quot;0&quot;&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Type: &lt;%= fmbb-&gt;content-header-doctype_txt %&gt; (&lt;%= fmbb-&gt;content-header-doctype %&gt;) &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Text: &lt;%= fmbb-&gt;content-header-headtext %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Process: &lt;%= fmbb-&gt;content-header-process %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Version: &lt;%= fmbb-&gt;content-header-version %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Date: &lt;%= _ddate %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Posting Date: &lt;%= _pdate %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Amount: &lt;%= _hamt %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+
+  &lt;TABLE  width= &quot;100%&quot; border=&quot;0&quot;&gt;
+   &lt;TR &gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Line &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Process &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Type&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Fund&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Budget Period &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Fund Center&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Funded Program&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Functional Area&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Amount&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Text&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+   &lt;/tr&gt;
+
+   &lt;% loop at fmbb-&gt;content-items into _doc_item. %&gt;
+   &lt;TR &gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-docln %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-process %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-budtype %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-fund %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-budget_pd %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-fundsctr %&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-measure %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-funcarea %&gt;&lt;/FONT&gt;&lt;/td&gt;
+
+     &lt;% write _doc_item-amount to _camt currency &apos;USD&apos;. %&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _camt %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-text50 %&gt;&lt;/FONT&gt;&lt;/td&gt;
+
+   &lt;/tr&gt;
+
+   &lt;% endloop. %&gt;
+   &lt;/table&gt;
+   &lt;/center&gt;
+ &lt;/font&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_APPROVE.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _docid type fmed_s_docid,
+      _wiid type sww_wiid.
+data: _messages   type zfmmi_messages,
+      _msg        type zfmmi_message,
+      _is_ok      type flag_x,
+      _user       type soudnamei1,
+      _user_data  type soudatai1,
+      _uname      type syuname,
+      _value      type string.
+
+_value = request-&gt;get_form_field( &apos;AGENT&apos; ).
+url = request-&gt;get_form_field( &apos;URL&apos; ).
+
+try.
+    if _value+0(2) eq &apos;US&apos;.
+      shift _value left by 2 places.
+    endif.
+    _uname = _value.
+
+  catch cx_root.
+    clear _uname.
+endtry.
+
+clear _user.
+_user-sapname = _uname.
+
+call function &apos;SO_USER_READ_API1&apos;
+  exporting
+    user      = _user
+  importing
+    user_data = _user_data.
+
+im_approver = _user_data-fullname.
+
+_docid = request-&gt;get_form_field( &apos;ID&apos; ).
+
+if _docid is not initial.
+
+  try.
+      create object fmbb
+        exporting
+          docid  = _docid
+        exceptions
+          error  = 1
+          others = 2.
+
+      if sy-subrc ne 0.
+        clear fmbb.
+      endif.
+
+    catch cx_root.
+      clear fmbb.
+  endtry.
+
+  if fmbb is bound.
+
+    call method fmbb-&gt;get_content
+      importing
+        is_ok     = _is_ok
+      changing
+        msg_lines = _messages.
+
+
+  endif.
+
+endif.</event>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_APPROVE.HTM" COMPNAME="FMBB" VERSION="A" PARDECLTYP="1" TYPTYPE="3" TYPE="ZCL_FI_FMBB" ALIASNAME="fmbb"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_APPROVE.HTM" COMPNAME="IM_APPROVER" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="im_approver"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_APPROVE.HTM" COMPNAME="URL" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="url"/>
+ </page>
+ <page APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REJECT.HTM" PAGENAME="email_reject.htm" AUTHOR="F0019738" CREATEDON="20140618" CHANGEDBY="F0019738" CHANGEDON="20150617" IMPLCLASS="CL_O2EFSPNT1TIB30QI4RY5325FBPH" GENDATE="20150617" GENTIME="142058" CHANGETIME="142022" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Rejection Notification">
+  <layout>&lt;%
+data:  _doc_item TYPE ZFI_FMBB_ITEM.
+DATA:  _camt TYPE char15,
+       _hamt type char15.
+data: _ddate(10) type c,
+      _pdate(10) type c,
+      _docUrl type string.
+
+if fmbb is bound.
+  write fmbb-&gt;content-header-docdate to _ddate MM/DD/YYYY.
+  write fmbb-&gt;content-header-postdate to _pdate MM/DD/YYYY.
+  write fmbb-&gt;content-header-amt_total to _hamt currency &apos;USD&apos;.
+endif.
+
+%&gt;
+
+&lt;html&gt;
+&lt;body&gt;
+
+  &lt;FONT face=&quot;Arial&quot;&gt;
+  &lt;p&gt;Document &lt;a href=&quot;&lt;%= Url %&gt;&quot; target=&quot;_blank&quot; &gt;&lt;%= fmbb-&gt;content-header-docnr %&gt;&lt;/a&gt;
+     for fiscal year &lt;B&gt;&lt;%= fmbb-&gt;content-header-docyear %&gt;&lt;/B&gt;
+     has been has been rejected by &lt;%= im_approver %&gt;
+  &lt;/p&gt;
+
+  &lt;center&gt;
+  &lt;TABLE  width= &quot;100%&quot; border=&quot;0&quot;&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Type: &lt;%= fmbb-&gt;content-header-doctype_txt %&gt; (&lt;%= fmbb-&gt;content-header-doctype %&gt;) &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Text: &lt;%= fmbb-&gt;content-header-headtext %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Process: &lt;%= fmbb-&gt;content-header-process %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Version: &lt;%= fmbb-&gt;content-header-version %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Date: &lt;%= _ddate %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Posting Date: &lt;%= _pdate %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Amount: &lt;%= _hamt %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;&lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;
+     Rejection comments: &lt;%= note %&gt; &lt;/FONT&gt;
+     &lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/table&gt;
+
+  &lt;TABLE  width= &quot;100%&quot; border=&quot;0&quot;&gt;
+   &lt;TR &gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Line &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Process &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Type&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Fund&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Budget Period &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Fund Center&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Funded Program&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Functional Area&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Amount&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Text&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+   &lt;/tr&gt;
+
+   &lt;% loop at fmbb-&gt;content-items into _doc_item. %&gt;
+   &lt;TR &gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-docln %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-process %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-budtype %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-fund %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-budget_pd %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-fundsctr %&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-measure %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-funcarea %&gt;&lt;/FONT&gt;&lt;/td&gt;
+
+     &lt;% write _doc_item-amount to _camt currency &apos;USD&apos;. %&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _camt %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-text50 %&gt;&lt;/FONT&gt;&lt;/td&gt;
+
+   &lt;/tr&gt;
+
+   &lt;% endloop. %&gt;
+   &lt;/table&gt;
+   &lt;/center&gt;
+ &lt;/font&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REJECT.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _docid type fmed_s_docid,
+      _wiid type sww_wiid.
+data: _messages   type zfmmi_messages,
+      _msg        type zfmmi_message,
+      _is_ok      type flag_x,
+      _user       type soudnamei1,
+      _user_data  type soudatai1,
+      _uname      type syuname,
+      _value      type string.
+
+_value = request-&gt;get_form_field( &apos;AGENT&apos; ).
+url = request-&gt;get_form_field( &apos;URL&apos; ).
+
+try.
+    if _value+0(2) eq &apos;US&apos;.
+      shift _value left by 2 places.
+    endif.
+
+    _uname = _value.
+
+  catch cx_root.
+    clear _uname.
+endtry.
+
+clear _user.
+_user-sapname = _uname.
+
+call function &apos;SO_USER_READ_API1&apos;
+  exporting
+    user      = _user
+  importing
+    user_data = _user_data.
+
+im_approver = _user_data-fullname.
+
+_docid = request-&gt;get_form_field( &apos;ID&apos; ).
+
+note = request-&gt;get_form_field( &apos;NOTES&apos; ).
+
+if _docid is not initial.
+
+  try.
+      create object fmbb
+        exporting
+          docid  = _docid
+        exceptions
+          error  = 1
+          others = 2.
+
+      if sy-subrc ne 0.
+        clear fmbb.
+      endif.
+
+    catch cx_root.
+      clear fmbb.
+  endtry.
+
+  if fmbb is bound.
+
+    call method fmbb-&gt;get_content
+      importing
+        is_ok     = _is_ok
+      changing
+        msg_lines = _messages.
+
+  endif.
+
+endif.</event>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REJECT.HTM" COMPNAME="FMBB" VERSION="A" PARDECLTYP="1" TYPTYPE="3" TYPE="ZCL_FI_FMBB" ALIASNAME="fmbb"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REJECT.HTM" COMPNAME="IM_APPROVER" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="im_approver"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REJECT.HTM" COMPNAME="NOTE" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="note"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REJECT.HTM" COMPNAME="URL" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="url"/>
+ </page>
+ <page APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REVIEW.HTM" PAGENAME="email_review.htm" AUTHOR="F0019738" CREATEDON="20140618" CHANGEDBY="F0019738" CHANGEDON="20150617" IMPLCLASS="CL_O2EHXFT50EVOTOVOBC5SSKZQYV9" GENDATE="20150617" GENTIME="142058" CHANGETIME="142030" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Review Notification">
+  <layout>&lt;%
+data:  _doc_item TYPE ZFI_FMBB_ITEM.
+DATA:  _camt TYPE char15,
+       _hamt type char15.
+data: _ddate(10) type c,
+      _pdate(10) type c,
+      _docUrl type string.
+
+if fmbb is bound.
+  write fmbb-&gt;content-header-docdate to _ddate MM/DD/YYYY.
+  write fmbb-&gt;content-header-postdate to _pdate MM/DD/YYYY.
+  write fmbb-&gt;content-header-amt_total to _hamt currency &apos;USD&apos;.
+endif.
+
+%&gt;
+
+&lt;html&gt;
+&lt;body&gt;
+
+  &lt;FONT face=&quot;Arial&quot;&gt;
+  &lt;p&gt;Document &lt;a href=&quot;&lt;%= Url %&gt;&quot; target=&quot;_blank&quot; &gt;&lt;%= fmbb-&gt;content-header-docnr %&gt;&lt;/a&gt;
+     for fiscal year &lt;B&gt;&lt;%= fmbb-&gt;content-header-docyear %&gt;&lt;/B&gt;
+     was initiated by &lt;%= im_approver %&gt; and sent to you for approval.
+  &lt;/p&gt;
+
+  &lt;center&gt;
+  &lt;TABLE  width= &quot;100%&quot; border=&quot;0&quot;&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Type: &lt;%= fmbb-&gt;content-header-doctype_txt %&gt; (&lt;%= fmbb-&gt;content-header-doctype %&gt;) &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Text: &lt;%= fmbb-&gt;content-header-headtext %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Process: &lt;%= fmbb-&gt;content-header-process %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Version: &lt;%= fmbb-&gt;content-header-version %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Document Date: &lt;%= _ddate %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Posting Date: &lt;%= _pdate %&gt; &lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Amount: &lt;%= _hamt %&gt; &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+
+  &lt;TABLE  width= &quot;100%&quot; border=&quot;0&quot;&gt;
+   &lt;TR &gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Line &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Process &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Type&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Fund&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Budget Period &lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Fund Center&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Funded Program&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Functional Area&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Amount&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;B&gt; Text&lt;/B&gt;&lt;/FONT&gt;&lt;/td&gt;
+   &lt;/tr&gt;
+
+   &lt;% loop at fmbb-&gt;content-items into _doc_item. %&gt;
+   &lt;TR &gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-docln %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-process %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-budtype %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-fund %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-budget_pd %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-fundsctr %&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-measure %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-funcarea %&gt;&lt;/FONT&gt;&lt;/td&gt;
+
+     &lt;% write _doc_item-amount to _camt currency &apos;USD&apos;. %&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _camt %&gt;&lt;/FONT&gt;&lt;/td&gt;
+     &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;&lt;%= _doc_item-text50 %&gt;&lt;/FONT&gt;&lt;/td&gt;
+
+   &lt;/tr&gt;
+
+   &lt;% endloop. %&gt;
+   &lt;/table&gt;
+   &lt;table&gt;
+     &lt;TR&gt;
+       &lt;td align = &quot;LEFT&quot;&gt; &lt;FONT face=&quot;Arial&quot;&gt;
+       Please log into the FMMI Portal to complete the required approval action for this document!
+       &lt;/FONT&gt;&lt;/td&gt;
+     &lt;/tr&gt;
+   &lt;/table&gt;
+   &lt;/center&gt;
+ &lt;/font&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REVIEW.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _docid type fmed_s_docid,
+      _wiid type sww_wiid.
+data: _messages   type zfmmi_messages,
+      _msg        type zfmmi_message,
+      _is_ok      type flag_x,
+      _user       type soudnamei1,
+      _user_data  type soudatai1,
+      _uname      type syuname,
+      _value      type string.
+
+_value = request-&gt;get_form_field( &apos;AGENT&apos; ).
+
+url =  request-&gt;get_form_field( &apos;URL&apos; ).
+
+try.
+    if _value+0(2) eq &apos;US&apos;.
+      shift _value left by 2 places.
+    endif.
+    _uname = _value.
+
+  catch cx_root.
+    clear _uname.
+endtry.
+
+clear _user.
+_user-sapname = _uname.
+
+call function &apos;SO_USER_READ_API1&apos;
+  exporting
+    user      = _user
+  importing
+    user_data = _user_data.
+
+im_approver = _user_data-fullname.
+
+_docid = request-&gt;get_form_field( &apos;ID&apos; ).
+
+if _docid is not initial.
+
+  try.
+      create object fmbb
+        exporting
+          docid  = _docid
+        exceptions
+          error  = 1
+          others = 2.
+
+      if sy-subrc ne 0.
+        clear fmbb.
+      endif.
+
+    catch cx_root.
+      clear fmbb.
+  endtry.
+
+  if fmbb is bound.
+
+    call method fmbb-&gt;get_content
+      importing
+        is_ok     = _is_ok
+      changing
+        msg_lines = _messages.
+
+
+  endif.
+
+endif.</event>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REVIEW.HTM" COMPNAME="FMBB" VERSION="A" PARDECLTYP="1" TYPTYPE="3" TYPE="ZCL_FI_FMBB" ALIASNAME="fmbb"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REVIEW.HTM" COMPNAME="IM_APPROVER" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="im_approver"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="EMAIL_REVIEW.HTM" COMPNAME="URL" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="url"/>
+ </page>
+ <page APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="MESSAGELOG.JSON" PAGENAME="messagelog.json" AUTHOR="F0019738" CREATEDON="20140618" CHANGEDBY="F0019738" CHANGEDON="20140618" IMPLCLASS="CL_O2EK25YGZ092KD0UHWDGI3U2M11" GENDATE="20140618" GENTIME="124945" CHANGETIME="124923" MIMETYPE="application/octet-stream" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Message Log">
+  <layout>&lt;%= json %&gt;</layout>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="MESSAGELOG.JSON" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _area type string.
+
+_area = request-&gt;get_form_field( &apos;AREA&apos; ).
+
+json = application-&gt;get_messages( _area ).</event>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="MESSAGELOG.JSON" COMPNAME="JSON" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="json"/>
+ </page>
+ <page APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" PAGENAME="start.html" AUTHOR="F0019738" CREATEDON="20140618" CHANGEDBY="F0019738" CHANGEDON="20140918" IMPLCLASS="CL_O2EM6W3SXLMGB160OGL47MOE96T" GENDATE="20140918" GENTIME="120503" CHANGETIME="120501" MIMETYPE="text/html" STATE="1" BROWSER_CACHE="0 " SERVER_CACHE="0 " IS_START_PAGE="X" LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="FMMI Application Start Page">
+  <layout>&lt;!DOCTYPE html&gt;
+
+ &lt;html&gt;
+&lt;head&gt;
+  &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=EmulateIE9&quot; &gt;
+  &lt;meta name=&quot;keywords&quot; content=&quot;Sample Budget Document Validation Functionality&quot; /&gt;
+  &lt;meta name=&quot;description&quot; content=&quot;Sample Budget Document Validation&quot; /&gt;
+  &lt;title id=&apos;Description&apos;&gt;This is sample Budget Document Validation&lt;/title&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;../public/jq/css/redmond/jquery-ui-1.10.4.redmond.css&quot; type=&quot;text/css&quot; /&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;../public/jq/jqx/styles/jqx.base.css&quot; type=&quot;text/css&quot; /&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;../public/fmmi/fmmi.css&quot; type=&quot;text/css&quot; /&gt;
+  &lt;style&gt;
+
+  &lt;/style&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/js/jquery-1.10.2.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/js/jquery-ui-1.10.4.custom.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxcore.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxexpander.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxvalidator.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxbuttons.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxcheckbox.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/globalization/globalize.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxcalendar.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxdatetimeinput.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxmaskedinput.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxinput.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxnumberinput.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxgrid1.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxdata.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxgrid.selection.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxtabs.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxgrid.columnsresize.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxscrollbar.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxdropdownlist.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/jq/jqx/jqxlistbox.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/fmmi/fmmi.tools.js&quot;&gt;&lt;/script&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;../public/fmmi/fmmi.fmbb.js&quot;&gt;&lt;/script&gt;
+
+  &lt;style&gt;
+    .prtlPrtlFullPageAppBody {
+       background-color: #FFFFFF;
+       margin: 0px 0px 0 0;
+       padding: 0px 0px 0 0px;
+    }
+  &lt;/style&gt;
+
+
+  &lt;script type=&quot;text/javascript&quot;&gt;
+
+
+
+
+  $(document).ready(function () {
+&lt;%--var iefix=document.createElement(&apos;meta&apos;);
+iefix.setAttribute(&quot;http-equiv&quot;, &quot;X-UA-Compatible&quot;);
+iefix.setAttribute(&quot;content&quot;, &quot;IE=Edge&quot;);
+document.getElementsByTagName(&apos;head&apos;)[0].appendChild(iefix);--%&gt;
+
+&lt;%-- var fmbb = new fmmiApplication(&apos;fmbb&apos;, function() { --%&gt;
+var doAjaxBeforeUnloadEnabled = true;
+
+var doAjaxBefore = function(e) {
+    if (!doAjaxBeforeUnloadEnabled) {
+        return;
+    }
+    ;
+    return &quot;Do you wish to leave this page?&quot;;
+};
+
+var doAjaxBeforeUnload = function(evt) {
+
+    if (!doAjaxBeforeUnloadEnabled) {
+        return;
+    }
+    ;
+
+    doAjaxBeforeUnloadEnabled = false;
+    $.ajax({
+        url: &quot;../zfmmi_adapter/wiunlock.htm?wi_id=&lt;%= wi_Id %&gt;&quot;,
+        type: &quot;POST&quot;,
+        success: function(a) {
+        },
+        async: false
+    });
+};
+
+            $(window).resize(function(){
+                setTitleScale();
+                setSubTitleScale();
+
+            });
+
+    window.onbeforeunload = doAjaxBefore;
+    $(window).unload(doAjaxBeforeUnload);
+
+&lt;%--        var scriptNode = document.createElement (&apos;script&apos;);
+            scriptNode.addEventListener (&quot;load&quot;, &quot;alertonLoad()&quot;, false);
+            scriptNode.addEventListener (&quot;unload&quot;, &quot;alertonUnLoad()&quot;, false);
+            scriptNode.type = &quot;text/javascript&quot;;--%&gt;
+
+&lt;%--        var targ = document.getElementsByTagName (&apos;head&apos;)[0] || document.body || document.documentElement;
+        targ.appendChild (scriptNode);--%&gt;
+
+        var _page = new fmmiPage( {&apos;logo&apos; : &apos;../public/fmmi/images/USDA_logo.png&apos;,
+                                   &apos;id&apos; : &apos;pagehead&apos;,
+                                   &apos;title&apos; : &apos;U.S. DEPARTMENT OF AGRICULTURE&apos;,
+                                   &apos;subTitle&apos; : &apos;Budgeting Documents Approval&apos; } );
+
+        var fmbb = new fmbbDocument( { &apos;workitem&apos; : &quot;&lt;%= wi_id %&gt;&quot;,
+                                       &apos;document&apos; : &quot;&lt;%= docid %&gt;&quot; } );
+
+        var tbar = new fmmi_toolbar( &quot;toolbar&quot; );
+        var msgBox = new fmmiMessageBox();
+
+        var isLoaded = $.Deferred();
+        var loaded = isLoaded.then(function( document ) {
+          return document;
+        });
+
+        loaded.done(function( document ) {
+             tbar.bind( document );
+
+             document.display( { &apos;header&apos; : &apos;#bdHead&apos;,
+                                  &apos;items&apos; : &apos;#bdItems&apos; } );
+
+             switch(document.procStatus) {
+                case &quot;1003&quot;:
+                case &quot;1005&quot; :
+                    tbar.addButton({ &quot;id&quot; : &quot;approve&quot;,
+                       &quot;img&quot; : &quot;../public/fmmi/images/accept.png&quot;,
+                       &quot;label&quot; : &quot;Approve!&quot;,
+                       &quot;tooltip&quot; : &quot;Approve Budget Document&quot;,
+                       &quot;messageHandler&quot; : msgBox,
+                       &quot;success&quot;: function(response) { msgBox.displayMsg( { &quot;forceExit&quot; : true } ); },
+                       &quot;fail&quot;: function(response) { msgBox.displayMsg(); },
+                       &quot;confirm&quot;: false
+                    });
+                    break;
+
+                case &quot;1007&quot; :
+                    tbar.addButton({ &quot;id&quot; : &quot;post&quot;,
+                       &quot;img&quot; : &quot;../public/fmmi/images/administration.png&quot;,
+                       &quot;label&quot; : &quot;Post!&quot;,
+                       &quot;tooltip&quot; : &quot;Post Budget Document&quot;,
+                       &quot;messageHandler&quot; : msgBox,
+                       &quot;success&quot;: function(response) { msgBox.displayMsg( { &quot;forceExit&quot; : true } ); },
+                       &quot;fail&quot;: function(response) { msgBox.displayMsg(); },
+                       &quot;confirm&quot;: false
+                    });
+                    break;
+
+             default:
+                  break;
+          }
+
+                  tbar.addButton({&quot;id&quot;: &quot;reject&quot;,
+                    &quot;img&quot;: &quot;../public/fmmi/images/reject.png&quot;,
+                    &quot;label&quot;: &quot;Reject&quot;,
+                    &quot;tooltip&quot;: &quot;Reject Budget Document&quot;,
+                    &quot;confirm&quot;: true,
+                    &quot;messageHandler&quot;: msgBox,
+                    &quot;success&quot;: function(response) { msgBox.displayMsg( { &quot;forceExit&quot; : true } ); },
+                    &quot;fail&quot;: function(response) { msgBox.displayMsg(); },
+                  });
+
+
+          tbar.addButton({
+             id: &quot;showmsg&quot;,
+             img: &quot;../public/fmmi/images/chat_2.png&quot;,
+             label: &quot;Messages&quot;,
+             tooltip: &quot;Show Messages&quot;,
+             callback: function() { msgBox.displayMsg(); },
+             confirm: false
+          });
+
+        });
+
+        loaded.fail(function( response ) {
+             msgBox.addMessages( response );
+             msgBox.displayMsg( { &quot;forceExit&quot; : true });
+
+        });
+
+
+        setTitleScale();
+        setSubTitleScale();
+
+        msgBox.clear();
+        fmbb.load( isLoaded );
+   });
+
+&lt;/script&gt;
+
+&lt;/head&gt;
+&lt;body&gt;
+&lt;%--  &lt;link rel=&quot;stylesheet&quot; href=&quot;../public/jq/css/redmond/jquery-ui-1.10.4.redmond.css&quot; type=&quot;text/css&quot; /&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;../public/jq/jqx/styles/jqx.base.css&quot; type=&quot;text/css&quot; /&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;../public/fmmi/fmmi.css&quot; type=&quot;text/css&quot; /&gt;--%&gt;
+
+    &lt;div id=&quot;pagehead&quot; class=&quot;main&quot;&gt;&lt;/div&gt;
+    &lt;div id=&apos;dconfirm&apos; style=&quot;z-index:9999; float: center;&quot;&gt;&lt;/div&gt;
+    &lt;div id=&apos;toolbar&apos; style=&quot;width: 100%; background: , none; height: 70px; &quot;&gt;&lt;/div&gt;
+    &lt;div id=&apos;bdDocument&apos; style=&apos;position:relative; left:0px; top:0px; z-index:0;&apos; &gt;
+        &lt;div id=&quot;bdHead&quot;&gt;
+        &lt;/div&gt;
+        &lt;br&gt;
+        &lt;div id=&quot;bdItems&quot;&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" EVHANDLER="ONDESTROY" VERSION="A" EVHNAME="OnDestroy">* this handler is called once the page reference is destroyed
+data i.
+
+i = 1.
+
+while i = 1.
+  endwhile.</event>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" EVHANDLER="ONINPUTPROCESSING" VERSION="A" EVHNAME="OnInputProcessing">* event handler for checking and processing user input and
+* for defining navigation
+
+data: j.
+
+j = 1.
+
+while j = 1.
+  endwhile.</event>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" EVHANDLER="ONMANIPULATION" VERSION="A" EVHNAME="OnManipulation">* event handler to manipulate dynamically the HTTP stream
+data i.
+
+i = 1.</event>
+  <event APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _docnr type bued_docnr,
+      _fikrs type fikrs,
+      _year type buku_docyear,
+      _mode type SYCHAR01,
+      _wi_reserved type boole_d.
+
+data: is_ok type flag_x.
+
+wi_id = request-&gt;get_form_field( &apos;WI_ID&apos; ).
+
+_docnr = request-&gt;get_form_field( &apos;BELNR&apos; ).
+
+mode = request-&gt;get_form_field( &apos;MODE&apos; ).
+
+_year = request-&gt;get_form_field( &apos;YEAR&apos; ).
+if _year is initial.
+
+  _year = sy-datum(4).
+endif.
+
+_fikrs = request-&gt;get_form_field( &apos;FMAREA&apos; ).
+if _fikrs is initial.
+  _fikrs = &apos;USDA&apos;.
+endif.
+
+
+docid-fm_area = _fikrs.
+docid-docyear = _year.
+docid-docnr   = _docnr.</event>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" COMPNAME="DOCID" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="FMED_S_DOCID" ALIASNAME="docid" TEXT="FM entry document ID"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" COMPNAME="IS_OK" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="FLAG_X" ALIASNAME="is_ok" TEXT="Indicator"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" COMPNAME="MODE" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="SYCHAR01" ALIASNAME="mode" TEXT="CHAR01 data element for SYST"/>
+  <parameter APPLNAME="ZFI_FMMI_FMBB" PAGEKEY="START.HTML" COMPNAME="WI_ID" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="SWW_WIID" ALIASNAME="wi_id" TEXT="Work item ID"/>
+ </page>
+</WAPA>

@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-16"?>
+<WAPA APPLNAME="ZFI_FSBP_NOTIFY" APPLCLAS="ZCL_FMBB_APPL" AUTHOR="F0019738" CREATEDON="20150427" CHANGEDBY="F0019738" CHANGEDON="20150427" APPLEXT="ZFI_FSBP_NOTIFY" DEVCLASS="$TMP" ORIGLANG="E" MODIFLANG="E" TEXT="FMMI Budgeting Document Approval (FMBB)">
+ <page APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_DELETED.HTM" PAGENAME="email_deleted.htm" AUTHOR="F0020958" CREATEDON="20150428" CHANGEDBY="F0019738" CHANGEDON="20150511" IMPLCLASS="CL_O2CXP2TMAVMJ5YJGV5BNK3NOF7P" GENDATE="20150511" GENTIME="163252" CHANGETIME="163152" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Request Deleted by Approver">
+  <layout>&lt;html&gt;
+&lt;body&gt;
+  &lt;FONT face=&quot;Arial&quot;&gt;
+  &lt;p&gt;Request &lt;%= req_num %&gt;
+     has been deleted for the following reasons:  &lt;B&gt;&lt;/B&gt;
+  &lt;/p&gt;
+  &lt;p&gt; (&lt;%= del_reason %&gt;) &lt;%= del_text %&gt; &lt;B&gt;&lt;/B&gt;.
+  &lt;/p&gt;
+ &lt;table width = &quot;100%&quot; border= &quot;0&quot;&gt;
+ &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Please refer to the Billing Process form in order to see the details of the FMMI document: &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+&lt;TABLE &gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;1.	Log into FMMI and access the Requester Billing Process Report. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;2.	Enter the Request Number and execute the report. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+   &lt;/center&gt;
+ &lt;/font&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_DELETED.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _step_guid type sysuuid_c,
+      _step_handler type ref to zcl_oif_queue_step,
+      _queue type ref to zcl_oif_queue.
+data: _data type ref to data.
+field-symbols: &lt;formdata&gt; type any,
+               &lt;delrev&gt; type zfi_bp_delrev.
+
+_step_guid = request-&gt;get_form_field( &apos;STEP_GUID&apos; ).
+
+if _step_guid is not initial.
+
+  try.
+      _step_handler = zcl_oif_queue_step=&gt;get_instance( _step_guid ).
+
+      if sy-subrc eq 0.
+
+        _queue = _step_handler-&gt;get_queue_manager( ).
+
+        clear _data.
+        _step_handler-&gt;read_formatted( importing ex_data = _data ).
+        assign _data-&gt;* to &lt;formdata&gt;.  &quot;extdata got entire data structure
+
+        assign component &apos;DELREV&apos; of structure &lt;formdata&gt; to &lt;delrev&gt; casting.
+        if sy-subrc eq 0 and &lt;delrev&gt; is assigned.
+          del_reason = &lt;delrev&gt;-delrcode.
+          del_text = &lt;delrev&gt;-delrtext.
+          req_num = _queue-&gt;attributes-refnum.
+          if del_text is initial.
+             del_text = zcl_oif_ucomm=&gt;reason_txt( ucomm = &apos;DELETE&apos; intid = _queue-&gt;attributes-intid reason = del_reason ).
+           endif.
+        endif.
+        unassign &lt;delrev&gt;.
+      endif.
+    catch cx_root.
+
+  endtry.
+endif.</event>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_DELETED.HTM" COMPNAME="DEL_REASON" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="del_reason"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_DELETED.HTM" COMPNAME="DEL_TEXT" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="del_text"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_DELETED.HTM" COMPNAME="REQ_NUM" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="req_num"/>
+ </page>
+ <page APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_POSTED.HTM" PAGENAME="email_posted.htm" AUTHOR="F0019738" CREATEDON="20150428" CHANGEDBY="F0020958" CHANGEDON="20150601" IMPLCLASS="CL_O2B8C6YGMMBY28642M2CSW1DWCL" GENDATE="20150601" GENTIME="102953" CHANGETIME="102953" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Posted Notification">
+  <layout>&lt;html&gt;
+&lt;body&gt;
+  &lt;FONT face=&quot;Arial&quot;&gt;
+  &lt;p&gt;FMMI document &lt;%= doc_num %&gt;
+     has been posted in FMMI for request &lt;%= req_num %&gt; &lt;B&gt;&lt;/B&gt;
+     .
+  &lt;/p&gt;
+  &lt;center&gt;
+  &lt;TABLE  width= &quot;100%&quot; border=&quot;0&quot;&gt;
+&lt;TR&gt;
+   &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Customer: &lt;%= cust_num %&gt; &lt;/FONT&gt;&lt;/td&gt;
+&lt;/tr&gt;
+ &lt;TR&gt;
+    &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Posting Date: &lt;%= post_date %&gt; &lt;/FONT&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+   &lt;TR&gt;
+    &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Total Amount: &lt;%= tot_amt %&gt; &lt;/FONT&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;
+
+  &lt;p&gt;
+
+  &lt;/p&gt;
+  &lt;center&gt;
+
+&lt;table width = &quot;100%&quot; border= &quot;0&quot;&gt;
+&lt;%
+  IF onetime_cust is not initial.
+%&gt;
+&lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Please contact the ASC in order to obtain a printable copy of this document. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;%
+  endif.
+%&gt;
+
+
+ &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Please refer to the Billing Process form in order to print the FMMI document: &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+&lt;TABLE &gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;1.	Log into FMMI and access the Requester Billing Process Report. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;2.	Enter the Request Number and execute the report. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;%
+  IF onetime_cust is initial.
+%&gt;
+  &lt;TR&gt;
+   &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;3.	Open the request from the report and open the relevant attachment to print the document.&lt;/FONT&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;%
+  endif.
+%&gt;
+ &lt;/table&gt;
+   &lt;/center&gt;
+ &lt;/font&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_POSTED.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">** the handler is called whenever a request is made for a particular page
+** it is used to restore the in
+*
+DATA: _step_guid TYPE sysuuid_c,
+      _step_handler TYPE REF TO zcl_oif_queue_step,
+      _queue TYPE REF TO zcl_oif_queue.
+
+DATA: _data TYPE REF TO data.
+
+FIELD-SYMBOLS: &lt;customer&gt; TYPE zfi_bp_cust,
+               &lt;header&gt; TYPE zfi_bp_hdr,
+               &lt;formdata&gt; TYPE ANY,
+               &lt;anydata&gt; TYPE ANY.
+
+
+_step_guid = request-&gt;get_form_field( &apos;STEP_GUID&apos; ).
+
+IF _step_guid IS NOT INITIAL.
+
+  TRY.
+      _step_handler = zcl_oif_queue_step=&gt;get_instance( _step_guid ).
+
+      IF sy-subrc EQ 0.
+
+        _queue = _step_handler-&gt;get_queue_manager( ).
+
+        CLEAR _data.
+        _step_handler-&gt;read_formatted( IMPORTING ex_data = _data ).
+        ASSIGN _data-&gt;* TO &lt;formdata&gt;.  &quot;extdata got entire data structure
+
+        UNASSIGN &lt;header&gt;.
+        ASSIGN COMPONENT &apos;HEADER&apos; OF STRUCTURE &lt;formdata&gt; TO &lt;header&gt; CASTING.
+        IF sy-subrc EQ 0 AND &lt;header&gt; IS ASSIGNED.
+          doc_num   = &lt;header&gt;-docnum.
+          WRITE &lt;header&gt;-total TO tot_amt CURRENCY &apos;USD&apos;.
+          cust_num = &lt;header&gt;-kunnr.
+        ENDIF.
+
+        UNASSIGN &lt;customer&gt;.
+        ASSIGN COMPONENT &apos;CUSTOMER&apos; OF STRUCTURE &lt;formdata&gt; TO &lt;customer&gt; CASTING.
+        onetime_cust = &lt;customer&gt;-ct_type.
+        IF sy-subrc EQ 0 AND &lt;customer&gt; IS ASSIGNED.
+          IF onetime_cust EQ &apos;3&apos;.
+            CONCATENATE &lt;customer&gt;-name1 &lt;customer&gt;-name2 INTO cust_num SEPARATED BY space.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+    CATCH cx_root.
+
+  ENDTRY.
+ENDIF.
+
+UNASSIGN &lt;header&gt;.
+UNASSIGN &lt;customer&gt;.
+
+post_date = sy-datum.
+req_num   = _queue-&gt;attributes-refnum.</event>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_POSTED.HTM" COMPNAME="CUST_NUM" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="cust_num"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_POSTED.HTM" COMPNAME="DOC_NUM" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="doc_num"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_POSTED.HTM" COMPNAME="ONETIME_CUST" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="onetime_cust"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_POSTED.HTM" COMPNAME="POST_DATE" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="post_date"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_POSTED.HTM" COMPNAME="REQ_NUM" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="req_num"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_POSTED.HTM" COMPNAME="TOT_AMT" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="CHAR20" ALIASNAME="tot_amt" TEXT="Char 20"/>
+ </page>
+ <page APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REJECT.HTM" PAGENAME="email_reject.htm" AUTHOR="F0019738" CREATEDON="20150427" CHANGEDBY="F0019738" CHANGEDON="20150511" IMPLCLASS="CL_O23KD13P4ZWQWMY8YSJTTC5JHTX" GENDATE="20150511" GENTIME="163253" CHANGETIME="163242" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Rejection Notification">
+  <layout>&lt;html&gt;
+&lt;body&gt;
+  &lt;FONT face=&quot;Arial&quot;&gt;
+  &lt;p&gt;Request &lt;%= req_num %&gt;
+     has been rejected for the following reasons:  &lt;B&gt;&lt;/B&gt;
+  &lt;/p&gt;
+  &lt;p&gt; (&lt;%= rej_reason %&gt;) &lt;%= rej_text %&gt; &lt;B&gt;&lt;/B&gt;.
+  &lt;/p&gt;
+ &lt;table width = &quot;100%&quot; border= &quot;0&quot;&gt;
+ &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Please refer to the Billing Process form in order to see the details of your request: &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+&lt;TABLE &gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;1.	Log into FMMI and access the Requester Billing Process Report. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;2.	Enter the Request Number and execute the report. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+   &lt;/center&gt;
+ &lt;/font&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REJECT.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _step_guid type sysuuid_c,
+      _step_handler type ref to zcl_oif_queue_step,
+      _queue type ref to zcl_oif_queue,
+      _uc type syucomm.
+
+data: _data type ref to data.
+
+field-symbols: &lt;delrev&gt; type zfi_bp_delrev,
+               &lt;formdata&gt; type any,
+               &lt;anydata&gt; type any.
+
+
+_step_guid = request-&gt;get_form_field( &apos;STEP_GUID&apos; ).
+
+if _step_guid is not initial.
+
+  try.
+      _step_handler = zcl_oif_queue_step=&gt;get_instance( _step_guid ).
+
+      if sy-subrc eq 0.
+
+        _queue = _step_handler-&gt;get_queue_manager( ).
+        req_num   = _queue-&gt;attributes-refnum.
+
+        clear _data.
+        _step_handler-&gt;read_formatted( importing ex_data = _data ).
+        assign _data-&gt;* to &lt;formdata&gt;.  &quot;extdata got entire data structure
+
+        unassign &lt;delrev&gt;.
+        assign component &apos;DELREV&apos; of structure &lt;formdata&gt; to &lt;delrev&gt; casting.
+        if sy-subrc eq 0 and &lt;delrev&gt; is assigned.
+          rej_reason = &lt;delrev&gt;-rejrcode.
+          rej_text = &lt;delrev&gt;-rejrtext.
+          if rej_text is initial.
+             case _queue-&gt;attributes-status.
+                when &apos;1006&apos; or &apos;1004&apos;.
+                   _uc = &apos;REJECT&apos;.
+                when &apos;2004&apos;.
+                   _uc = &apos;REJREV&apos;.
+             endcase.
+
+             rej_text = zcl_oif_ucomm=&gt;reason_txt( ucomm = _uc intid = _queue-&gt;attributes-intid reason = rej_reason ).
+           endif.
+        endif.
+
+      endif.
+    catch cx_root.
+
+  endtry.
+endif.
+
+unassign &lt;delrev&gt;.</event>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REJECT.HTM" COMPNAME="REJ_REASON" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="rej_reason"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REJECT.HTM" COMPNAME="REJ_TEXT" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="rej_text"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REJECT.HTM" COMPNAME="REQ_NUM" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="req_num"/>
+ </page>
+ <page APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REVERSED.HTM" PAGENAME="email_reversed.htm" AUTHOR="F0020958" CREATEDON="20150428" CHANGEDBY="F0019738" CHANGEDON="20150511" IMPLCLASS="CL_O29GM702V34XE4WBP4G292T32TH" GENDATE="20150511" GENTIME="163253" CHANGETIME="163208" MIMETYPE="text/html" BROWSER_CACHE="0 " SERVER_CACHE="0 " LAYOUTLANGU="E" VERSION="A" DEVCLASS="$TMP" LANGU="E" DESCRIPT="Reverse the original document">
+  <layout>&lt;html&gt;
+&lt;body&gt;
+  &lt;FONT face=&quot;Arial&quot;&gt;
+  &lt;p&gt;FMMI document &lt;%= doc_num %&gt;
+     has been reversed in FMMI by &lt;%= rev_doc_num%&gt;
+     for request &lt;%= req_num%&gt; for the following reasons:  &lt;B&gt;&lt;/B&gt;
+  &lt;/p&gt;
+  &lt;p&gt; (&lt;%= rev_reason %&gt;) &lt;%= rev_text %&gt; &lt;B&gt;&lt;/B&gt;.
+  &lt;/p&gt;
+ &lt;table width = &quot;100%&quot; border= &quot;0&quot;&gt;
+ &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;Please refer to the Billing Process form in order to see the details of the FMMI document: &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+&lt;TABLE &gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;1.	Log into FMMI and access the Requester Billing Process Report. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;TR&gt;
+     &lt;td align = &quot;LEFT&quot;&gt;&lt;FONT face=&quot;Arial&quot;&gt;2.	Enter the Request Number and execute the report. &lt;/FONT&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+   &lt;/center&gt;
+ &lt;/font&gt;
+&lt;/body&gt;
+&lt;/html&gt;</layout>
+  <event APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REVERSED.HTM" EVHANDLER="ONREQUEST" VERSION="A" EVHNAME="OnRequest">* the handler is called whenever a request is made for a particular page
+* it is used to restore the internal data structures from the request
+
+data: _step_guid type sysuuid_c,
+      _step_handler type ref to zcl_oif_queue_step,
+      _queue type ref to zcl_oif_queue.
+
+data: _data type ref to data.
+
+field-symbols: &lt;delrev&gt; type zfi_bp_delrev,
+               &lt;header&gt; type zfi_bp_hdr,
+               &lt;formdata&gt; type any,
+               &lt;anydata&gt; type any.
+
+
+_step_guid = request-&gt;get_form_field( &apos;STEP_GUID&apos; ).
+
+if _step_guid is not initial.
+
+  try.
+      _step_handler = zcl_oif_queue_step=&gt;get_instance( _step_guid ).
+
+      if sy-subrc eq 0.
+
+        _queue = _step_handler-&gt;get_queue_manager( ).
+        req_num   = _queue-&gt;attributes-refnum.
+
+        clear _data.
+        _step_handler-&gt;read_formatted( importing ex_data = _data ).
+        assign _data-&gt;* to &lt;formdata&gt;.  &quot;extdata got entire data structure
+
+        unassign &lt;delrev&gt;.
+        assign component &apos;DELREV&apos; of structure &lt;formdata&gt; to &lt;delrev&gt; casting.
+        if sy-subrc eq 0 and &lt;delrev&gt; is assigned.
+          rev_doc_num = &lt;delrev&gt;-revdocnr.
+          rev_reason = &lt;delrev&gt;-revrcode.
+          rev_text = &lt;delrev&gt;-revrtext.
+          if rev_text is initial.
+             rev_text = zcl_oif_ucomm=&gt;reason_txt( ucomm = &apos;REVERSE&apos; intid = _queue-&gt;attributes-intid reason = rev_reason ).
+          endif.
+        endif.
+
+        unassign &lt;header&gt;.
+        assign component &apos;HEADER&apos; of structure &lt;formdata&gt; to &lt;header&gt; casting.
+        if sy-subrc eq 0 and &lt;header&gt; is assigned.
+          doc_num = &lt;header&gt;-docnum.
+        endif.
+
+      endif.
+    catch cx_root.
+
+  endtry.
+endif.
+
+unassign &lt;delrev&gt;.
+unassign &lt;header&gt;.</event>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REVERSED.HTM" COMPNAME="DOC_NUM" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="doc_num"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REVERSED.HTM" COMPNAME="REQ_NUM" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="req_num"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REVERSED.HTM" COMPNAME="REV_DOC_NUM" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="rev_doc_num"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REVERSED.HTM" COMPNAME="REV_REASON" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="rev_reason"/>
+  <parameter APPLNAME="ZFI_FSBP_NOTIFY" PAGEKEY="EMAIL_REVERSED.HTM" COMPNAME="REV_TEXT" VERSION="A" PARDECLTYP="1" TYPTYPE="1" TYPE="STRING" ALIASNAME="rev_text"/>
+ </page>
+</WAPA>

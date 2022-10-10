@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-16"?>
+<CLAS CLSNAME="ZCL_XXSB_JSON" VERSION="1" LANGU="E" DESCRIPT="JSON Object" UUID="A17261536511A236E1000000C782C605" CATEGORY="00" EXPOSURE="2" STATE="1" RELEASE="0" AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" CHGDANYON="00000000" CLSCCINCL="X" FIXPT="X" UNICODE="X" R3RELEASE="701" CLSBCCAT="00" DURATION_TYPE="0 " RISK_LEVEL="0 ">
+ <types CLSNAME="ZCL_XXSB_JSON" CMPNAME="TJSON" VERSION="1" LANGU="E" EXPOSURE="1" STATE="1" EDITORDER="1 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140507" TYPTYPE="4" SRCROW1="6 " SRCCOLUMN1="4 " SRCROW2="10 " SRCCOLUMN2="20 " TYPESRC_LENG="133 " TYPESRC="begin of TJSON,
+         fieldname type string,
+         fieldvalue type string,
+         type(1) type c,
+         end of tjson
+"/>
+ <types CLSNAME="ZCL_XXSB_JSON" CMPNAME="TJSONT" VERSION="1" LANGU="E" EXPOSURE="1" STATE="1" EDITORDER="2 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140507" TYPTYPE="4" SRCROW1="12 " SRCCOLUMN1="4 " SRCROW2="12 " SRCCOLUMN2="29 " TYPESRC_LENG="28 " TYPESRC="TJSONT type table of tjson
+"/>
+ <publicSection>class ZCL_XXSB_JSON definition
+  public
+  create public .
+
+*&quot;* public components of class ZCL_XXSB_JSON
+*&quot;* do not include other source files here!!!
+public section.
+
+  methods CONSTRUCTOR .
+  methods ADD_DATA
+    importing
+      !FIELDNAME type STRING optional
+      !FIELDVALUE type DATA
+      !TYPEREF type ref to CL_ABAP_TYPEDESCR optional .
+  methods ENCODED
+    returning
+      value(JSON) type STRING .
+  class-methods DATA2JSON
+    importing
+      !NAME type STRING optional
+      !SRCDATA type DATA
+    returning
+      value(JSON) type STRING .
+  class-methods GET_INSTANCE
+    importing
+      !KIND type CHAR1
+    returning
+      value(INSTANCE) type ref to ZCL_XXSB_JSON .</publicSection>
+ <protectedSection>*&quot;* protected components of class ZCL_XXSB_JSON
+*&quot;* do not include other source files here!!!
+protected section.
+
+  types:
+    begin of TJSON,
+         fieldname type string,
+         fieldvalue type string,
+         type(1) type c,
+         end of tjson .
+  types:
+    TJSONT type table of tjson .
+
+  data:
+    ARRAY type table of ref to zcl_xxsb_json .
+  constants __JSON type SEOCLSNAME value &apos;ZCL_XXSB_JSON&apos;. &quot;#EC NOTEXT
+  constants __JSON_OBJ type SEOCLSNAME value &apos;ZCL_XXSB_JSON_OBJECT&apos;. &quot;#EC NOTEXT
+  data NAME type STRING .</protectedSection>
+ <privateSection>*&quot;* private components of class ZCL_XXSB_JSON
+*&quot;* do not include other source files here!!!
+private section.</privateSection>
+ <localImplementation>*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</localImplementation>
+ <localTypes>*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</localTypes>
+ <localMacros>*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</localMacros>
+ <textPool/>
+ <classDocumentation/>
+ <attribute CLSNAME="ZCL_XXSB_JSON" CMPNAME="ARRAY" VERSION="1" LANGU="E" EXPOSURE="1" STATE="1" EDITORDER="1 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140507" ATTDECLTYP="0" ATTEXPVIRT="0" TYPTYPE="4" SRCROW1="15 " SRCCOLUMN1="4 " SRCROW2="15 " SRCCOLUMN2="43 " TYPESRC_LENG="42 " TYPESRC="ARRAY type table of ref to zcl_xxsb_json
+"/>
+ <attribute CLSNAME="ZCL_XXSB_JSON" CMPNAME="NAME" VERSION="1" LANGU="E" EXPOSURE="1" STATE="1" EDITORDER="4 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" ATTDECLTYP="0" ATTEXPVIRT="0" TYPTYPE="1" TYPE="STRING" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " R3RELEASE="701" TYPESRC_LENG="0 "/>
+ <attribute CLSNAME="ZCL_XXSB_JSON" CMPNAME="__JSON" VERSION="1" LANGU="E" DESCRIPT="Object Type Name" EXPOSURE="1" STATE="1" EDITORDER="2 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" ATTDECLTYP="2" ATTVALUE="&apos;ZCL_XXSB_JSON&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="SEOCLSNAME" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " R3RELEASE="701" TYPESRC_LENG="0 "/>
+ <attribute CLSNAME="ZCL_XXSB_JSON" CMPNAME="__JSON_OBJ" VERSION="1" LANGU="E" DESCRIPT="Object Type Name" EXPOSURE="1" STATE="1" EDITORDER="3 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" ATTDECLTYP="2" ATTVALUE="&apos;ZCL_XXSB_JSON_OBJECT&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="SEOCLSNAME" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " R3RELEASE="701" TYPESRC_LENG="0 "/>
+ <method CLSNAME="ZCL_XXSB_JSON" CMPNAME="ADD_DATA" VERSION="1" LANGU="E" DESCRIPT="Add Field" EXPOSURE="2" STATE="1" EDITORDER="2 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" MTDTYPE="0" MTDDECLTYP="0" R3RELEASE="701" BCMTDCAT="00" BCMTDSYN="0">
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="ADD_DATA" SCONAME="FIELDNAME" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="ADD_DATA" SCONAME="FIELDVALUE" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="2 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="DATA"/>
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="ADD_DATA" SCONAME="TYPEREF" VERSION="1" LANGU="E" DESCRIPT="Runtime Type Services" CMPTYPE="1" MTDTYPE="0" EDITORDER="3 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="3" TYPE="CL_ABAP_TYPEDESCR" PAROPTIONL="X"/>
+  <source>method ADD_DATA.
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+ <method CLSNAME="ZCL_XXSB_JSON" CMPNAME="CONSTRUCTOR" VERSION="1" LANGU="E" DESCRIPT="CONSTRUCTOR" EXPOSURE="2" STATE="1" EDITORDER="1 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" MTDTYPE="2" MTDDECLTYP="0" R3RELEASE="701" BCMTDCAT="00" BCMTDSYN="0">
+  <source>method CONSTRUCTOR.
+  clear me-&gt;array.
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+ <method CLSNAME="ZCL_XXSB_JSON" CMPNAME="DATA2JSON" VERSION="1" LANGU="E" DESCRIPT="Data to JSON" EXPOSURE="2" STATE="1" EDITORDER="4 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140507" MTDTYPE="0" MTDDECLTYP="1" R3RELEASE="701" BCMTDCAT="00" BCMTDSYN="0">
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="DATA2JSON" SCONAME="NAME" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140515" CHANGEDON="00000000" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="DATA2JSON" SCONAME="SRCDATA" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="2 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140515" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="DATA"/>
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="DATA2JSON" SCONAME="JSON" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="3 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140515" PARDECLTYP="3" PARPASSTYP="0" TYPTYPE="1" TYPE="STRING"/>
+  <source>method DATA2JSON.
+
+  data: __ttdesc type ref to cl_abap_typedescr.
+  data: _json type ref to zcl_xxsb_json.
+
+  __ttdesc = cl_abap_structdescr=&gt;describe_by_data( srcdata ).
+
+  check __ttdesc is bound.
+
+  _json ?= get_instance( __ttdesc-&gt;kind ).
+
+  check _json is bound.
+
+  _json-&gt;add_data( fieldname = name fieldvalue = srcdata ).
+
+  json = _json-&gt;encoded( ).
+
+
+  if name is not initial.
+     concatenate &apos;{&apos; json &apos;}&apos; into json.
+  endif.
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+ <method CLSNAME="ZCL_XXSB_JSON" CMPNAME="ENCODED" VERSION="1" LANGU="E" DESCRIPT="Encoded JSON obejct" EXPOSURE="2" STATE="1" EDITORDER="3 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140507" MTDTYPE="0" MTDDECLTYP="0" R3RELEASE="701" BCMTDCAT="00" BCMTDSYN="0">
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="ENCODED" SCONAME="JSON" VERSION="1" LANGU="E" DESCRIPT="Internal header control" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" PARDECLTYP="3" PARPASSTYP="0" TYPTYPE="1" TYPE="STRING"/>
+  <source>method ENCODED.
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+ <method CLSNAME="ZCL_XXSB_JSON" CMPNAME="GET_INSTANCE" VERSION="1" LANGU="E" DESCRIPT="Get JSON Instance" EXPOSURE="2" STATE="1" EDITORDER="5 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140507" MTDTYPE="0" MTDDECLTYP="1" R3RELEASE="701" BCMTDCAT="00" BCMTDSYN="0">
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="GET_INSTANCE" SCONAME="KIND" VERSION="1" LANGU="E" DESCRIPT="Single-Character Indicator" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="CHAR1"/>
+  <parameter CLSNAME="ZCL_XXSB_JSON" CMPNAME="GET_INSTANCE" SCONAME="INSTANCE" VERSION="1" LANGU="E" DESCRIPT="JSON Object" CMPTYPE="1" MTDTYPE="0" EDITORDER="2 " DISPID="0 " AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" PARDECLTYP="3" PARPASSTYP="0" TYPTYPE="3" TYPE="ZCL_XXSB_JSON"/>
+  <source>method get_instance.
+  data _jstype type seoclsname.
+
+  case kind.
+    when &apos;S&apos;.
+      _jstype = &apos;ZCL_XXSB_JSON_RECORD&apos;.
+
+    when &apos;T&apos;.
+      _jstype = &apos;ZCL_XXSB_JSON_TABLE&apos;.
+
+    when others.
+      _jstype = &apos;ZCL_XXSB_JSON_OBJECT&apos;.
+  endcase.
+
+  try.
+
+      create object instance type (_jstype).
+
+    catch cx_root.
+      clear instance.
+  endtry.
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+</CLAS>

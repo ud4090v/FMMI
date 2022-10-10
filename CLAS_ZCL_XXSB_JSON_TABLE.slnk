@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-16"?>
+<CLAS CLSNAME="ZCL_XXSB_JSON_TABLE" VERSION="1" LANGU="E" DESCRIPT="JSON Array Handler" UUID="96BC695354CDAD36E1000000C782C605" CATEGORY="00" EXPOSURE="2" STATE="1" RELEASE="0" AUTHOR="F0019738" CREATEDON="20140507" CHANGEDON="00000000" CHGDANYON="00000000" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" R3RELEASE="701" CLSBCCAT="00" DURATION_TYPE="0 " RISK_LEVEL="0 ">
+ <publicSection>class ZCL_XXSB_JSON_TABLE definition
+  public
+  inheriting from ZCL_XXSB_JSON_OBJECT
+  final
+  create public .
+
+*&quot;* public components of class ZCL_XXSB_JSON_TABLE
+*&quot;* do not include other source files here!!!
+public section.
+
+  methods ADD_DATA
+    redefinition .
+  methods ENCODED
+    redefinition .</publicSection>
+ <protectedSection>*&quot;* protected components of class ZCL_XXSB_JSON_TABLE
+*&quot;* do not include other source files here!!!
+protected section.</protectedSection>
+ <privateSection>*&quot;* private components of class ZCL_XXSB_JSON_TABLE
+*&quot;* do not include other source files here!!!
+private section.</privateSection>
+ <localImplementation>*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</localImplementation>
+ <localTypes>*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</localTypes>
+ <localMacros>*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</localMacros>
+ <textPool/>
+ <classDocumentation/>
+ <inheritance CLSNAME="ZCL_XXSB_JSON_TABLE" REFCLSNAME="ZCL_XXSB_JSON_OBJECT" VERSION="1" STATE="1" AUTHOR="F0019738" CREATEDON="20140507" CHANGEDBY="F0019738" CHANGEDON="20140507">
+  <redefinition CLSNAME="ZCL_XXSB_JSON_TABLE" REFCLSNAME="ZCL_XXSB_JSON_OBJECT" VERSION="1" MTDNAME="ADD_DATA"/>
+  <redefinition CLSNAME="ZCL_XXSB_JSON_TABLE" REFCLSNAME="ZCL_XXSB_JSON_OBJECT" VERSION="1" MTDNAME="ENCODED"/>
+ </inheritance>
+ <method CLSNAME="ZCL_XXSB_JSON_OBJECT" CMPNAME="ADD_DATA" VERSION="0" EXPOSURE="0" STATE="0" EDITORDER="0 " DISPID="0 " CREATEDON="00000000" CHANGEDON="00000000" MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+  <source>method add_data.
+*CALL METHOD SUPER-&gt;ADD_DATA
+*  EXPORTING
+**    fieldname  =
+*    FIELDVALUE =
+*    .
+
+  data: __ttdesc type ref to cl_abap_typedescr,
+        __typedesc type ref to cl_abap_structdescr,
+        __tabdesc type ref to cl_abap_tabledescr.
+
+  data: _reftab type ref to data,
+        _refline type ref to data.
+
+  field-symbols: &lt;fld&gt; type any,
+                 &lt;line&gt; type any,
+                 &lt;tab&gt; type table.
+
+  field-symbols &lt;json&gt; type ref to zcl_xxsb_json.
+
+  __ttdesc = cl_abap_typedescr=&gt;describe_by_data( fieldvalue ).
+
+  check __ttdesc-&gt;kind eq &apos;T&apos;.
+
+  me-&gt;name = fieldname.
+
+  __tabdesc ?= __ttdesc.
+  __typedesc ?= __tabdesc-&gt;get_table_line_type( ).
+
+  create data _refline type handle __typedesc.
+
+  assign _refline-&gt;* to &lt;line&gt;.
+
+  create data _reftab like standard table of &lt;line&gt;.
+
+  assign _reftab-&gt;* to &lt;tab&gt;.
+
+  &lt;tab&gt; = fieldvalue.
+  unassign: &lt;line&gt;,  &lt;fld&gt;.
+
+  loop at &lt;tab&gt; assigning &lt;fld&gt;.
+
+    append initial line to array assigning &lt;json&gt;.
+
+    &lt;json&gt; ?= zcl_xxsb_json=&gt;get_instance( &apos;S&apos; ).
+    check &lt;json&gt; is bound.
+
+    &lt;json&gt;-&gt;add_data( &lt;fld&gt; ).
+
+  endloop.
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+ <method CLSNAME="ZCL_XXSB_JSON_OBJECT" CMPNAME="ENCODED" VERSION="0" EXPOSURE="0" STATE="0" EDITORDER="0 " DISPID="0 " CREATEDON="00000000" CHANGEDON="00000000" MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+  <source>method ENCODED.
+*CALL METHOD SUPER-&gt;ENCODED
+*  RECEIVING
+*    JSON   =
+*    .
+
+  field-symbols: &lt;fld&gt; type any.
+  field-symbols &lt;json&gt; type ref to zcl_xxsb_json.
+  data: __typedesc type ref to cl_abap_structdescr.
+  data: _json_obj type ref to zcl_xxsb_json_object,
+        __components type cl_abap_structdescr=&gt;component_table,
+        __comp like line of __components.
+
+  data __jstr type string.
+
+  loop at array assigning &lt;json&gt;.
+
+    check &lt;json&gt; is bound.
+
+    __jstr = &lt;json&gt;-&gt;encoded( ).
+
+    if json is initial.
+       json = __jstr.
+    else.
+       if __jstr is not initial.
+         concatenate json __jstr into json separated by &apos;,&apos;.
+       endif.
+    endif.
+  endloop.
+
+  concatenate &apos;[&apos; json &apos;]&apos; into json.
+
+  if me-&gt;name is not initial.
+     concatenate &apos;&quot;&apos; me-&gt;name &apos;&quot;&apos; &apos;:&apos; json into json.
+  endif.
+
+
+endmethod.</source>
+  <methodDocumentation/>
+ </method>
+</CLAS>
